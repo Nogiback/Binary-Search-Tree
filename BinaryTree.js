@@ -116,10 +116,120 @@ class BinaryTree {
     }
   }
 
+  /* Implement 3 methods for depth-first traversal on the Binary Tree */
+
+  // LEFT ROOT RIGHT TRAVERSAL
+  inorder(callbackFn, node = this.root, inorderList = []) {
+    if (node === null) {
+      return;
+    }
+
+    this.inorder(callbackFn, node.left, inorderList);
+
+    if (callbackFn) {
+      callbackFn(node);
+    } else {
+      inorderList.push(node.data);
+    }
+
+    this.inorder(callbackFn, node.right, inorderList);
+
+    if (inorderList.length > 0) {
+      return inorderList;
+    }
+  }
+
+  // ROOT LEFT RIGHT TRAVERSAL
+  preorder(callbackFn, node = this.root, preorderList = []) {
+    if (node === null) {
+      return;
+    }
+
+    if (callbackFn) {
+      callbackFn(node);
+    } else {
+      preorderList.push(node.data);
+    }
+
+    this.preorder(callbackFn, node.left, preorderList);
+    this.preorder(callbackFn, node.right, preorderList);
+
+    if (preorderList.length > 0) {
+      return preorderList;
+    }
+  }
+
+  // LEFT RIGHT ROOT TRAVERSAL
+  postorder(callbackFn, node = this.root, postorderList = []) {
+    if (node === null) {
+      return;
+    }
+
+    this.postorder(callbackFn, node.left, postorderList);
+    this.postorder(callbackFn, node.right, postorderList);
+
+    if (callbackFn) {
+      callbackFn(node);
+    } else {
+      postorderList.push(node.data);
+    }
+
+    if (postorderList.length > 0) {
+      return postorderList;
+    }
+  }
+
+  height(node = this.root) {
+    if (node === null) {
+      return 0;
+    }
+    const leftH = this.height(node.left);
+    const rightH = this.height(node.right);
+
+    return Math.max(leftH, rightH) + 1;
+  }
+
+  depth(inputNode, node = this.root, count = 0) {
+    if (node === null) {
+      return;
+    }
+
+    if (node.data === inputNode.data) {
+      return count;
+    }
+
+    if (node.data > inputNode.data) {
+      return this.depth(inputNode, node.left, count + 1);
+    } else {
+      return this.depth(inputNode, node.right, count + 1);
+    }
+  }
+
+  isBalanced(node = this.root) {
+    if (node === null) {
+      return;
+    }
+    const leftH = this.height(node.left);
+    const rightH = this.height(node.right);
+    const heightDiff = Math.abs(leftH - rightH);
+
+    if (heightDiff > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  rebalance() {
+    const inorderList = this.inorder();
+    this.root = this.buildTree(inorderList);
+  }
+
   prettyPrint(node = this.root, prefix = "", isLeft = true) {
     if (node === null) {
       return;
     }
+
     if (node.right !== null) {
       this.prettyPrint(
         node.right,
@@ -127,7 +237,9 @@ class BinaryTree {
         false,
       );
     }
+
     console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+
     if (node.left !== null) {
       this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
     }
@@ -135,13 +247,3 @@ class BinaryTree {
 }
 
 module.exports = BinaryTree;
-
-const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-let tree = new BinaryTree(array);
-tree.prettyPrint();
-tree.insert(33);
-tree.prettyPrint();
-tree.delete(23);
-tree.prettyPrint();
-tree.find(4);
-console.log(tree.levelOrder());
